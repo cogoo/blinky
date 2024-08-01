@@ -22,7 +22,7 @@ app.use(
 
 app.get('/', (c) => {
   return c.json<ActionGetResponse>({
-    icon: 'https://cdn-icons-png.flaticon.com/512/3610/3610624.png',
+    icon: 'https://arweave.net/_xAKprLrFovVXL_3vzbbQjxRib16dQfkkNHYlymBdB8',
     title: 'WBA Blink demo',
     description: 'My First Blink',
     label: 'Do Something',
