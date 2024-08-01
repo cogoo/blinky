@@ -20,12 +20,21 @@ app.use(
   }),
 );
 
-app.get('/', (c) => {
+app.get<any, ActionGetRequest>('/', (c) => {
   return c.json<ActionGetResponse>({
     icon: 'https://arweave.net/_xAKprLrFovVXL_3vzbbQjxRib16dQfkkNHYlymBdB8',
     title: 'WBA Blink demo',
     description: 'My First Blink',
     label: 'Do Something',
+  });
+});
+
+app.post('/', async (c) => {
+  const { account } = await c.req.json<ActionPostRequest>();
+  console.log('user account:', account);
+  return c.json<ActionPostResponse>({
+    message: 'Trying to Rugg',
+    transaction: createMemoTransaction(account),
   });
 });
 
