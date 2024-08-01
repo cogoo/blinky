@@ -2,6 +2,7 @@ import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { serveStatic } from '@hono/node-server/serve-static';
+import { ActionGetResponse } from '@solana/actions';
 
 const app = new Hono();
 
@@ -25,7 +26,12 @@ app.use(
 );
 
 app.get('/', (c) => {
-  return c.text('Hello Hono!');
+  return c.json<ActionGetResponse>({
+    icon: 'https://cdn-icons-png.flaticon.com/512/3610/3610624.png',
+    title: 'WBA Blink demo',
+    description: 'My First Blink',
+    label: 'Do Something',
+  });
 });
 
 const port = 3000;
