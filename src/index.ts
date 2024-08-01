@@ -8,6 +8,19 @@ import {
   ActionPostRequest,
   ActionPostResponse,
 } from '@solana/actions';
+import { getAddMemoInstruction } from '@solana-program/memo';
+import {
+  createSolanaRpc,
+  mainnet,
+  pipe,
+  createTransactionMessage,
+  setTransactionMessageLifetimeUsingBlockhash,
+  appendTransactionMessageInstruction,
+  getBase64EncodedWireTransaction,
+  setTransactionMessageFeePayer,
+  address,
+  compileTransaction,
+} from '@solana/web3.js';
 
 const app = new Hono();
 
@@ -25,7 +38,7 @@ app.get<any, ActionGetRequest>('/', (c) => {
     icon: 'https://arweave.net/_xAKprLrFovVXL_3vzbbQjxRib16dQfkkNHYlymBdB8',
     title: 'WBA Blink demo',
     description: 'My First Blink',
-    label: 'Do Something',
+    label: 'Ruggg meee',
   });
 });
 
@@ -34,7 +47,7 @@ app.post('/', async (c) => {
   console.log('user account:', account);
   return c.json<ActionPostResponse>({
     message: 'Trying to Rugg',
-    transaction: createMemoTransaction(account),
+    transaction: await createMemoTransaction(account),
   });
 });
 
@@ -45,3 +58,24 @@ serve({
   fetch: app.fetch,
   port,
 });
+
+async function createMemoTransaction(account: string) {
+  const rpc = createSolanaRpc(mainnet('https://api.mainnet-beta.solana.com'));
+
+  const { value: latestBlockhash } = await rpc
+    .getLatestBlockhash({ commitment: 'confirmed' })
+    .send();
+
+  const message = pipe(
+    createTransactionMessage({ version: 0 }),
+    (m) => setTransactionMessageFeePayer(address(account), m),
+    (m) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, m),
+    (m) =>
+      appendTransactionMessageInstruction(
+        getAddMemoInstruction({ memo: `${account} is trying to rug me` }),
+        m,
+      ),
+  );
+
+  return getBase64EncodedWireTransaction(compileTransaction(message));
+}
